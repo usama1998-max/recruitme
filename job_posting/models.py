@@ -2,26 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# Assigns Roles to user when registering
-class UserRole(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-
-    HR = 'HR'
-    CANDIDATE = 'CANDIDATE'
-    ADMIN = 'ADMIN'
-
-    user_type = [
-        (HR, 'hr'),
-        (CANDIDATE, 'candidate'),
-        (ADMIN, 'admin')
-    ]
-
-    role = models.CharField(max_length=10, choices=user_type)
-
-    def __str__(self):
-        return str(self.user)+" ["+str(self.role)+"] "
-
-
 # HR Model
 class HumanResource(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -30,6 +10,7 @@ class HumanResource(models.Model):
     company_logo = models.ImageField(upload_to="company_logos", default='static/img/hr.jpg')
 
     def __str__(self):
+        print("HR Profile created!")
         return str(self.user)+" "+str(self.company_name)
 
 

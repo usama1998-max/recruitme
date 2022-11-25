@@ -7,9 +7,10 @@ urlpatterns = [
     path('', home, name='home'),
     # path('hr/', hr_profile, name='hr'),
     path('hr/register/', hr_register, name='hr_register'),
+    path('hr/profile/', hr_profile, name='hr_profile'),
     path('login/', login_user, name='login'),
     path('logout/', logout_user, name='logout'),
-    path('candidate/', candidate_profile, name='candidate'),
+    path('candidate/profile/', candidate_profile, name='candidate_profile'),
     path('candidate/register/', candidate_register, name='candidate_register'),
 ]
 

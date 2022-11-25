@@ -8,23 +8,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="Recruitment website">
     <meta name="author" content="Rehman">
-    <link rel="icon" href="{% static 'assets/images/favicon.ico' %}">
+    <link rel="icon" href="{% static 'main_style/assets/images/favicon.ico' %}">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
 
     <!-- Bootstrap core CSS -->
-    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'vendor/bootstrap/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'main_style/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Additional CSS Files -->
-    <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}">
+    <link rel="stylesheet" href="{% static 'main_style/assets/css/fontawesome.css' %}">
+    <link rel="stylesheet" href="{% static 'main_style/assets/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'main_style/assets/css/owl.css' %}">
 
-    <link rel="stylesheet" type="text/css" href="{% static 'fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'form_style/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
     <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="{% static 'fonts/iconic/css/material-design-iconic-font.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'form_style/fonts/iconic/css/material-design-iconic-font.min.css' %}">
 
-    <link rel="stylesheet" type="text/css" href="{% static 'css/util.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'form_style/css/util.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'form_style/css/main.css' %}">
     {%  if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -32,6 +31,15 @@
     {% endif %}
 </head>
 <body>
+<!-- ***** Preloader Start ***** -->
+    <div id="preloader">
+        <div class="jumper">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+<!-- ***** Preloader End ***** -->
 
 <div>
     {% if messages %}
@@ -62,16 +70,16 @@
 </div>
 
     <!-- Bootstrap core JavaScript -->
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-
-
+    <script src="{% static 'main_style/vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'main_style/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'main_style/vendor/bootstrap/js/bootstrap.js' %}"></script>
+    <script src="{% static 'main_style/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
     <!-- Additional Scripts -->
-    <script src="{% static 'assets/js/custom.js' %}"></script>
-    <script src="{% static 'assets/js/owl.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'main_style/assets/js/custom.js' %}"></script>
+    <script src="{% static 'main_style/assets/js/owl.js' %}"></script>
+    <script src="{% static 'form_style/js/main.js' %}"></script>
+    <!--<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>-->
 
 
 </body>
