@@ -1,6 +1,4 @@
 {% block content %}
-
-
 <header class="">
       <nav class="navbar navbar-expand-lg">
         <div class="container">
@@ -16,27 +14,31 @@
                     </a>
                 </li>
 
-                <li class="nav-item"><a class="nav-link" href="#">Jobs</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'jobs' %}">Jobs</a></li>
 
                 <li class="nav-item"><a class="nav-link" href="#">About us</a></li>
 
                 <li class="nav-item"><a class="nav-link" href="#">Blog</a></li>
 
-                {% if current_user.is_authenticated %}
+                {% if request.user.is_authenticated %}
                 <li class="nav-item">
                     <div class="dropdown">
                       <button class="btn btn-danger dropdown-toggle mt-2" type="button" data-toggle="dropdown">
-                           {{ current_user }}
+                           {{ request.user }}
                       <span class="caret"></span></button>
                       <ul class="dropdown-menu bg-dark mt-3 mb-2">
                           <li class="p-3"><a href="{% url 'logout' %}">Logout</a></li>
-                          {% if role == 'HR' %}
-                          <li class="p-3"><a href="{% url 'hr_profile' %}">Profile</a></li>
-                          <li class="p-3"><a href="{% url 'hr_profile' %}">Dashboard</a></li>
-                          <li class="p-3"><a href="{% url 'hr_profile' %}">Post Job!</a></li>
-                          {% elif role == 'Candidates' %}
-                          <li class="p-3"><a href="{% url 'candidate_profile' %}">Profile</a></li>
+
+                          {% for g in request.user.groups.all %}
+                          {% if g.name == 'HR' %}
+                          <li class="p-3"><a href="{% url 'hr' request.user.username %}">Profile</a></li>
+                          <li class="p-3"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                          <li class="p-3"><a href="{% url 'create_job' %}">Post Job</a></li>
+                          {% elif g.name == 'Candidates' %}
+                          <li class="p-3"><a href="{% url 'candidate' %}">Profile</a></li>
                           {% endif %}
+                          {% endfor %}
+
                       </ul>
                     </div>
                 </li>
@@ -49,6 +51,5 @@
         </div>
       </nav>
     </header>
-
 {% endblock %}
 

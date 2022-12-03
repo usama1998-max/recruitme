@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    {% include 'navigation.html' %}
+    {% if current_user.is_authenticated and role == 'HR' %}
+        <div class="page-heading contact-heading header-text mb-4" style="background-image: linear-gradient(to bottom right, red, black);">
+            <h1 class="container text-light">Dashboard</h1>
+        </div>
+
+        <div class="container-fluid">
+            <h2 class="header mt-4 ml-3">CVs</h2>
+            <table class="table">
+                <thead>
+                    Candidates who applied
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>CV</th>
+                        <th>Approve</th>
+                    </tr>
+                    <tr>
+                        <td>Usama Naseer</td>
+                        <td>m.usamanaseer68@gmail.com</td>
+                        <td><button class="btn bg-dark text-light">CV</button></td>
+                        <td>
+                            <button class="btn bg-success text-light">Yes</button>
+                            <button class="btn bg-danger text-light">No</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+    {% endif %}
+
+{% endblock %}

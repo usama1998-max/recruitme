@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{% static 'main_style/assets/css/fontawesome.css' %}">
     <link rel="stylesheet" href="{% static 'main_style/assets/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'main_style/assets/css/owl.css' %}">
+    <link rel="stylesheet" href="{% static 'job_style/css/main_job.css' %}">
 
     <link rel="stylesheet" type="text/css" href="{% static 'form_style/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
     <!--===============================================================================================-->
@@ -24,6 +25,7 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'form_style/css/util.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'form_style/css/main.css' %}">
+
     {%  if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -69,6 +71,18 @@
     {% endblock %}
 </div>
 
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="inner-content">
+              <p>Copyright © 2022</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <!-- Bootstrap core JavaScript -->
     <script src="{% static 'main_style/vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'main_style/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
@@ -80,7 +94,6 @@
     <script src="{% static 'form_style/js/main.js' %}"></script>
     <!--<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
     <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>-->
-
 
 </body>
 </html>

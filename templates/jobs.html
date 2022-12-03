@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    {% include 'navigation.html' %}
+
+
+    <div class="container px-4 py-5 mx-auto">
+    <div class="row d-flex justify-content-center" style="margin-top:80px;">
+        {% for job in job %}
+        <div class="card">
+            <div class="row px-3">
+                <img class="profile-pic mr-3" src="{{ job.user.company_logo.url }}">
+                <div class="flex-column">
+                    <a href="{% url 'about_company' job.user %}" class="mb-0 font-weight-normal">
+                        <h2 class="text-dark">{{ job.user.company_name }}</h2>
+                    </a>
+                    <p class="text-primary">{{ job.date_posted }}</p>
+                </div>
+            </div>
+            <div class="heading mt-4"><a href="{% url 'view_job' job.id %}"><h2>{{ job.title }}</h2></a></div>
+
+            <div class="row px-3 mt-4">
+                <a href="{% url 'hr' job.user %}" class="link text-primary"><p class="fa fa-user options mb-0 mr-1"></p> {{ job.user.user.username }}</a>
+                <a class="btn btn-danger text-light ml-auto">Apply</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}

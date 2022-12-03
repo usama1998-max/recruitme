@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'job_posting.apps.JobPostingConfig',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -125,8 +126,8 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfilescollected'
 
-MEDIA_ROOT = BASE_DIR / 'media_files'
-MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = '/media/'
 
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
