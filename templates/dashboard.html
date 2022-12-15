@@ -7,32 +7,35 @@
             <h1 class="container text-light">Dashboard</h1>
         </div>
 
-        <div class="container-fluid">
-            <h2 class="header mt-4 ml-3">CVs</h2>
-            <table class="table">
-                <thead>
-                    Candidates who applied
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>CV</th>
-                        <th>Approve</th>
-                    </tr>
-                    <tr>
-                        <td>Usama Naseer</td>
-                        <td>m.usamanaseer68@gmail.com</td>
-                        <td><button class="btn bg-dark text-light">CV</button></td>
-                        <td>
-                            <button class="btn bg-success text-light">Yes</button>
-                            <button class="btn bg-danger text-light">No</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
 
-        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">CV</th>
+                    <th scope="col">Approve</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cwa in cwa %}
+                <tr>
+                    <td scope="row">{{ cwa.full_name }}</td>
+                    <td><a href="{% url 'candidate' %}">{{ cwa.email }}</a></td>
+                    <td>{{ cwa.role }}</td>
+                    <td><a href="{% get_media_prefix %}{{ cwa.cv }}" class="btn bg-dark text-light">CV</a></td>
+                    <td class="d-flex">
+                        <form method="post">
+                            {% csrf_token %}
+                            <button class="btn bg-success text-light" type="submit" value="{{ cwa.id }}" name="accept">accept</button>
+                            <button class="btn bg-danger text-light ml-2" type="submit" value="{{ cwa.id }}" name="reject">reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
     {% endif %}
 

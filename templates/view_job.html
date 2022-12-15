@@ -25,6 +25,19 @@
       <p class="text-dark mt-4">{{ job.description }}</p>
     </div>
 
+    {% if role == 'Candidates' %}
+    <div class="container mt-4 d-block">
+                {% if has_applied == True %}
+                <button class="btn btn-success mt-4" onclick="alert('you have already applied');">Applied</button>
+                {% else %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form }}
+                    <button class="btn btn-danger mt-4" type="submit">Apply</button>
+                </form>
+                {% endif %}
+    </div>
+    {% endif %}
     {% endif %}
 
 

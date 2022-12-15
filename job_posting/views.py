@@ -1,21 +1,28 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User, Group
-from .models import HumanResource, Candidate, JobPost
+from .models import HumanResource, Candidate, JobPost, CandidatesWhoApplied
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .form import CreateUserForm, HRProfile, UserUpdateForm, CandidateProfile, CreateJobPost
+from .form import CreateUserForm, HRProfile, UserUpdateForm, CandidateProfile, CreateJobPost, ApplyForm
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
 from .decorators import redirect_on_user_roles
-from django.urls import reverse
 
 
 # -------------------- Custom Validation --------------------
 def check_user_email(email: str) -> bool:
     try:
         User.objects.get(email=email)
+        return True
+    except ObjectDoesNotExist:
+        return False
+
+
+def has_applied(user_email: str, role: str) -> bool:
+    try:
+        CandidatesWhoApplied.objects.get(email=user_email, role=role)
         return True
     except ObjectDoesNotExist:
         return False
@@ -143,8 +150,25 @@ def about_hr(request, user):
 def dashboard(request):
     current_user = request.user
     role = current_user.groups.all()[0].name
-    return render(request, "dashboard.html", {'current_user': current_user,
-                                              'role': role})
+    cwa = None
+
+    if request.method == 'POST':
+        if request.POST.get('accept'):
+            print(request.POST)
+            return redirect('dashboard')
+        elif request.POST.get('reject'):
+            c = CandidatesWhoApplied.objects.get(id=int(request.POST.get('reject')))
+            c.delete()
+            messages.error(request, "Candidate rejected")
+            return redirect('dashboard')
+
+    else:
+        cwa = CandidatesWhoApplied.objects.all()
+
+    return render(request, "dashboard.html", {'title': 'Dashboard',
+                                              'current_user': current_user,
+                                              'role': role,
+                                              'cwa': cwa})
 
 
 # -------------------- COMPANY VIEWS --------------------
@@ -226,8 +250,8 @@ def candidate_profile(request):
 def about_candidate(request):
     current_user = request.user
     role = None
-    if current_user.groups.all()[0].name:
-        role = current_user.groups.all()[0].name
+    if request.user.groups.all()[0].name:
+        role = request.user.groups.all()[0].name
     print(role)
     return render(request, "candidate.html", {'title': 'About',
                                               'current_user': current_user,
@@ -236,10 +260,18 @@ def about_candidate(request):
 
 # -------------------- JOB VIEWS --------------------
 def jobs(request):
+
     current_user = request.user
     job = JobPost.objects.all()
+
+    try:
+        role = request.user.groups.all()[0].name
+    except Exception:
+        role = None
+
     return render(request, "jobs.html", {'title': 'jobs',
                                          'job': job,
+                                         'role': role,
                                          'current_user': current_user})
 
 
@@ -253,7 +285,9 @@ def create_job(request):
         cjp = CreateJobPost(request.POST)
 
         if cjp.is_valid():
-            JobPost.objects.create(user=hr, title=cjp.cleaned_data['title'], description=cjp.cleaned_data['description'])
+            JobPost.objects.create(user=hr,
+                                   title=cjp.cleaned_data['title'],
+                                   description=cjp.cleaned_data['description'])
             messages.success(request, 'Post created')
             return redirect('jobs')
         else:
@@ -264,11 +298,39 @@ def create_job(request):
 
 
 @login_required(login_url=settings.LOGIN_URL)
+@csrf_protect
 def view_job(request, pk):
-    current_user = request.user
-    j = JobPost.objects.get(id=pk)
-    return render(request, "view_job.html", {'current_user': current_user,
-                                             'job': j})
+    try:
+        current_user = None
+        j = JobPost.objects.get(id=pk)
+        role = None
+        applied = has_applied(request.user.email, j.title)
+
+        if request.method == 'POST':
+            name = request.user.first_name+" "+request.user.last_name
+            cwa = ApplyForm(request.POST, files=request.FILES)
+
+            if cwa.is_valid():
+                CandidatesWhoApplied.objects.create(full_name=name,
+                                                    email=request.user.email,
+                                                    role=j.title,
+                                                    cv=cwa.cleaned_data['cv'])
+
+                messages.success(request, "CV uploaded successfully")
+                return redirect('jobs')
+        else:
+            current_user = request.user
+            cwa = ApplyForm()
+            role = request.user.groups.all()[0].name
+
+        return render(request, "view_job.html", {'title': 'About job',
+                                                 'current_user': current_user,
+                                                 'role': role,
+                                                 'job': j,
+                                                 'form': cwa,
+                                                 'has_applied': applied})
+    except ObjectDoesNotExist:
+        return redirect('jobs')
 
 
 

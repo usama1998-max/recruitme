@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.forms import PasswordInput
-from .models import HumanResource, Candidate, JobPost
+from .models import HumanResource, Candidate, JobPost, CandidatesWhoApplied
 
 
 class CreateUserForm(UserCreationForm):
@@ -49,7 +49,7 @@ class HRProfile(forms.ModelForm):
 class CandidateProfile(forms.ModelForm):
     class Meta:
         model = Candidate
-        fields = ['phone', 'address', 'profile_pic']
+        fields = ['phone', 'address', 'profile_pic', 'cv']
 
         widgets = {
             'phone': forms.TextInput(attrs={'class': 'input100'}),
@@ -67,3 +67,11 @@ class CreateJobPost(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'input100'}),
             # 'description': forms.TextInput(attrs={'class': 'input100'}),
         }
+
+
+class ApplyForm(forms.ModelForm):
+    class Meta:
+        model = CandidatesWhoApplied
+
+        fields = ['cv']
+

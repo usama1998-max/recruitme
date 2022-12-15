@@ -19,10 +19,14 @@
             </div>
             <div class="heading mt-4"><a href="{% url 'view_job' job.id %}"><h2>{{ job.title }}</h2></a></div>
 
+
             <div class="row px-3 mt-4">
                 <a href="{% url 'hr' job.user %}" class="link text-primary"><p class="fa fa-user options mb-0 mr-1"></p> {{ job.user.user.username }}</a>
-                <a class="btn btn-danger text-light ml-auto">Apply</a>
+                {% if role == 'Candidates' %}
+                <a class="btn btn-danger text-light ml-auto" href="{% url 'view_job' job.id %}">View Job</a>
+                {% endif  %}
             </div>
+
         </div>
         {% endfor %}
     </div>

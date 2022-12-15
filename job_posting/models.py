@@ -8,7 +8,7 @@ class HumanResource(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
     company_name = models.CharField(max_length=100, blank=True)
-    company_logo = models.ImageField(upload_to="company_logos", default='hr.jpg')
+    company_logo = models.ImageField(upload_to="company_logos", default='default_img/default_company_logo.png')
     profile_pic = models.ImageField(upload_to="hr_profile_pic", default='default_img/hr.jpg')
 
     def __str__(self):
@@ -24,6 +24,7 @@ class Candidate(models.Model):
     phone = models.CharField(max_length=15, null=True, unique=True)
     profile_pic = models.ImageField(upload_to="candidate_profile", default="default_img/hr.jpg")
     address = models.CharField(max_length=200, null=True, blank=True)
+    cv = models.FileField(upload_to="cvs")
 
     def __str__(self):
         return str(self.user)
@@ -42,5 +43,11 @@ class JobPost(models.Model):
         return int(self.id)
 
 
+class CandidatesWhoApplied(models.Model):
+    full_name = models.CharField(max_length=100)
+    email = models.CharField(max_length=100)
+    role = models.CharField(max_length=20)
+    cv = models.FileField(upload_to="resume")
 
-
+    def __str__(self):
+        return str(self.full_name)
