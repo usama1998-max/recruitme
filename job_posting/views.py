@@ -110,6 +110,7 @@ def hr_profile(request):
             form.save()
             hr_form.save()
             messages.success(request, "Updated")
+            return redirect('hr_profile')
         else:
             messages.error(request, form.errors)
     else:
@@ -133,21 +134,27 @@ def hr_profile(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 def about_hr(request, user):
-    current_user = User.objects.get(username=user)
+    try:
+        current_user = User.objects.get(username=user)
+        user_hr = HumanResource.objects.get(user=current_user)
+        profile_image = user_hr.profile_pic.url
+        role = None
 
-    role = None
+        if current_user.groups.all()[0].name:
+            role = current_user.groups.all()[0].name
 
-    if current_user.groups.all()[0].name:
-        role = current_user.groups.all()[0].name
+        return render(request, "hr.html", {'title': 'About',
+                                           'current_user': current_user,
+                                           'profile_image': profile_image,
+                                           'role': role})
 
-    return render(request, "hr.html", {'title': 'About',
-                                       'current_user': current_user,
-                                       'role': role})
+    except ObjectDoesNotExist:
+        return redirect('home')
 
 
 @login_required(login_url=settings.LOGIN_URL)
 @redirect_on_user_roles(allowed_group='HR')
-def dashboard(request):
+def dashboard(request, title):
     current_user = request.user
     role = current_user.groups.all()[0].name
     cwa = None
@@ -168,7 +175,23 @@ def dashboard(request):
     return render(request, "dashboard.html", {'title': 'Dashboard',
                                               'current_user': current_user,
                                               'role': role,
-                                              'cwa': cwa})
+                                              'cwa': cwa,
+                                              'job_title': title})
+
+
+@login_required(login_url=settings.LOGIN_URL)
+@redirect_on_user_roles(allowed_group='HR')
+def job_post_list(request):
+    current_user = request.user
+    job = JobPost.objects.all()
+    role = None
+    if request.user.groups.all()[0].name:
+        role = request.user.groups.all()[0].name
+
+    return render(request, "job_post_list.html", {'title': 'My Job Post',
+                                                  'current_user': current_user,
+                                                  'role': role,
+                                                  'jobs': job,})
 
 
 # -------------------- COMPANY VIEWS --------------------
@@ -227,13 +250,14 @@ def candidate_profile(request):
             form.save()
             c_form.save()
             messages.success(request, "Updated")
+            return redirect('candidate_profile')
         else:
             messages.error(request, form.errors)
     else:
         form = UserUpdateForm(instance=request.user)
         c_form = CandidateProfile(instance=request.user.candidate)
         profile_image = request.user.candidate.profile_pic.url
-
+        print(profile_image)
     try:
         user_role = request.user.groups.all()[0].name
     except Exception:
@@ -247,15 +271,23 @@ def candidate_profile(request):
 
 
 @login_required(login_url=settings.LOGIN_URL)
-def about_candidate(request):
-    current_user = request.user
-    role = None
-    if request.user.groups.all()[0].name:
-        role = request.user.groups.all()[0].name
-    print(role)
-    return render(request, "candidate.html", {'title': 'About',
-                                              'current_user': current_user,
-                                              'role': role})
+def about_candidate(request, user):
+    try:
+        cu = User.objects.get(username=user)
+        candidate = Candidate.objects.get(user=cu)
+        profile_image = candidate.profile_pic.url
+        role = None
+        if request.user.groups.all()[0].name:
+            role = request.user.groups.all()[0].name
+
+        return render(request, "candidate.html", {'title': 'About',
+                                                  'current_user': request.user,
+                                                  'candidate': candidate,
+                                                  'profile_image': profile_image,
+                                                  'role': role})
+
+    except ObjectDoesNotExist:
+        return redirect('home')
 
 
 # -------------------- JOB VIEWS --------------------
@@ -331,6 +363,3 @@ def view_job(request, pk):
                                                  'has_applied': applied})
     except ObjectDoesNotExist:
         return redirect('jobs')
-
-
-

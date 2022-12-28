@@ -32,10 +32,10 @@
                           {% for g in request.user.groups.all %}
                           {% if g.name == 'HR' %}
                           <li class="p-3"><a href="{% url 'hr' request.user.username %}">Profile</a></li>
-                          <li class="p-3"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                          <li class="p-3"><a href="{% url 'job_dashboard' %}">My Jobs</a></li>
                           <li class="p-3"><a href="{% url 'create_job' %}">Post Job</a></li>
                           {% elif g.name == 'Candidates' %}
-                          <li class="p-3"><a href="{% url 'candidate' %}">Profile</a></li>
+                          <li class="p-3"><a href="{% url 'candidate' request.user.username %}">Profile</a></li>
                           {% endif %}
                           {% endfor %}
 

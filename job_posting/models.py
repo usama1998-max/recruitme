@@ -46,6 +46,7 @@ class JobPost(models.Model):
 class CandidatesWhoApplied(models.Model):
     full_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
+    username = models.CharField(max_length=100)
     role = models.CharField(max_length=20)
     cv = models.FileField(upload_to="resume")
 

@@ -7,25 +7,29 @@
             <h1 class="container text-light">Dashboard</h1>
         </div>
 
+        <div class="container">
+            <div class="p-3">
+              <h2 style="border-bottom:1px solid black; text-align:center;padding:5px;">{{ job_title }}</h2>
+            </div>
+        </div>
 
-        <table class="table">
+        <table class="table mt-4 ml-2">
             <thead>
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Email</th>
-                    <th scope="col">Role</th>
                     <th scope="col">CV</th>
                     <th scope="col">Approve</th>
                 </tr>
             </thead>
             <tbody>
                 {% for cwa in cwa %}
+                {% if cwa.role == job_title %}
                 <tr>
                     <td scope="row">{{ cwa.full_name }}</td>
-                    <td><a href="{% url 'candidate' %}">{{ cwa.email }}</a></td>
-                    <td>{{ cwa.role }}</td>
-                    <td><a href="{% get_media_prefix %}{{ cwa.cv }}" class="btn bg-dark text-light">CV</a></td>
-                    <td class="d-flex">
+                    <td scope="row"><a href="{% url 'candidate' cwa.id %}">{{ cwa.email }}</a></td>
+                    <td scope="row"><a href="{% get_media_prefix %}{{ cwa.cv }}" class="btn bg-dark text-light">CV</a></td>
+                    <td class="row d-flex">
                         <form method="post">
                             {% csrf_token %}
                             <button class="btn bg-success text-light" type="submit" value="{{ cwa.id }}" name="accept">accept</button>
@@ -33,6 +37,7 @@
                         </form>
                     </td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
