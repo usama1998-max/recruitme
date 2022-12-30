@@ -28,7 +28,7 @@
     {% if role == 'Candidates' %}
     <div class="container mt-4 d-block">
                 {% if has_applied == True %}
-                <button class="btn btn-success mt-4" onclick="alert('you have already applied');">Applied</button>
+                <button class="btn btn-success mt-4" onclick="alert('You have already applied');">Applied</button>
                 {% else %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}

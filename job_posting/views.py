@@ -9,6 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
 from .decorators import redirect_on_user_roles
+import logging
+
+
+logging.basicConfig(level=logging.INFO, filename="tmp/project.log", filemode='a')
+logger = logging.getLogger(__name__)
 
 
 # -------------------- Custom Validation --------------------
@@ -33,7 +38,8 @@ def home(request):
     current_user = request.user
     try:
         user_role = request.user.groups.all()[0].name
-    except Exception:
+    except Exception as e:
+        logger.info(f"function: {home.__name__}, msg:{e}")
         user_role = None
     return render(request, "home.html", {'current_user': current_user,
                                          'role': user_role,
@@ -95,12 +101,14 @@ def hr_register(request):
 @csrf_protect
 @login_required(login_url=settings.LOGIN_URL)
 @redirect_on_user_roles(allowed_group='HR')
-def hr_profile(request):
+def hr_profile(request, user):
     user_role = None
     form = UserUpdateForm()
     hr_form = HRProfile()
     company_image = None
     profile_image = None
+    current_user = User.objects.get(username=user)
+    user_hr = HumanResource.objects.get(user=current_user)
 
     if request.method == 'POST':
         form = UserUpdateForm(request.POST, instance=request.user)
@@ -114,14 +122,15 @@ def hr_profile(request):
         else:
             messages.error(request, form.errors)
     else:
-        form = UserUpdateForm(instance=request.user)
-        hr_form = HRProfile(instance=request.user.humanresource)
-        company_image = request.user.humanresource.company_logo.url
-        profile_image = request.user.humanresource.profile_pic.url
+        form = UserUpdateForm(instance=current_user)
+        hr_form = HRProfile(instance=user_hr)
+        company_image = user_hr.company_logo.url
+        profile_image = user_hr.profile_pic.url
 
     try:
         user_role = request.user.groups.all()[0].name
-    except Exception:
+    except Exception as e:
+        logger.info(f"function: {hr_profile.__name__}, msg:{e}")
         user_role = None
     return render(request, "hr_profile.html", {'title': 'Profile',
                                                'current_user': request.user,
@@ -148,7 +157,12 @@ def about_hr(request, user):
                                            'profile_image': profile_image,
                                            'role': role})
 
-    except ObjectDoesNotExist:
+    except ObjectDoesNotExist as e:
+        logger.info(f"function: {about_hr.__name__}, msg:{e}")
+        return redirect('home')
+
+    except Exception as e:
+        logger.info(f"function: {about_hr.__name__}, msg:{e}")
         return redirect('home')
 
 
@@ -166,8 +180,8 @@ def dashboard(request, title):
         elif request.POST.get('reject'):
             c = CandidatesWhoApplied.objects.get(id=int(request.POST.get('reject')))
             c.delete()
-            messages.error(request, "Candidate rejected")
-            return redirect('dashboard')
+            messages.success(request, "Candidate rejected")
+            return redirect('dashboard', title=title)
 
     else:
         cwa = CandidatesWhoApplied.objects.all()
@@ -181,17 +195,22 @@ def dashboard(request, title):
 
 @login_required(login_url=settings.LOGIN_URL)
 @redirect_on_user_roles(allowed_group='HR')
-def job_post_list(request):
-    current_user = request.user
-    job = JobPost.objects.all()
-    role = None
-    if request.user.groups.all()[0].name:
-        role = request.user.groups.all()[0].name
+def job_post_list(request, user):
+    try:
+        current_user = User.objects.get(username=user)
+        job = JobPost.objects.all()
+        role = None
+        if request.user.groups.all()[0].name:
+            role = request.user.groups.all()[0].name
 
-    return render(request, "job_post_list.html", {'title': 'My Job Post',
-                                                  'current_user': current_user,
-                                                  'role': role,
-                                                  'jobs': job,})
+        return render(request, "job_post_list.html", {'title': 'My Job Post',
+                                                      'current_user': current_user,
+                                                      'role': role,
+                                                      'jobs': job})
+
+    except Exception as e:
+        logger.info(f"function: {job_post_list.__name__}, msg:{e}")
+        return redirect('home')
 
 
 # -------------------- COMPANY VIEWS --------------------
@@ -260,7 +279,8 @@ def candidate_profile(request):
         print(profile_image)
     try:
         user_role = request.user.groups.all()[0].name
-    except Exception:
+    except Exception as e:
+        logger.info(f"function: {candidate_profile.__name__}, msg:{e}")
         user_role = None
     return render(request, "candidate_profile.html", {'title': 'Profile',
                                                       'current_user': request.user,
@@ -286,7 +306,12 @@ def about_candidate(request, user):
                                                   'profile_image': profile_image,
                                                   'role': role})
 
-    except ObjectDoesNotExist:
+    except ObjectDoesNotExist as e:
+        logger.info(f"function: {about_candidate.__name__}, msg:{e}")
+        return redirect('home')
+
+    except Exception as e:
+        logger.info(f"function: {about_candidate.__name__}, msg:{e}")
         return redirect('home')
 
 
@@ -298,7 +323,8 @@ def jobs(request):
 
     try:
         role = request.user.groups.all()[0].name
-    except Exception:
+    except Exception as e:
+        logger.info(f"function: {jobs.__name__}, msg:{e}")
         role = None
 
     return render(request, "jobs.html", {'title': 'jobs',
@@ -307,12 +333,12 @@ def jobs(request):
                                          'current_user': current_user})
 
 
-def create_job(request):
+def create_job(request, user):
     cjp = CreateJobPost()
+    myuser = User.objects.get(username=user)
+    hr = HumanResource.objects.get(user=myuser)
 
     if request.method == 'POST':
-        user = User.objects.get(username=request.user.username)
-        hr = HumanResource.objects.get(user=user)
 
         cjp = CreateJobPost(request.POST)
 
@@ -331,10 +357,11 @@ def create_job(request):
 
 @login_required(login_url=settings.LOGIN_URL)
 @csrf_protect
-def view_job(request, pk):
+def view_job(request, job_id):
     try:
-        current_user = None
-        j = JobPost.objects.get(id=pk)
+        current_user = request.user
+        j = JobPost.objects.get(pk=job_id)
+
         role = None
         applied = has_applied(request.user.email, j.title)
 
@@ -355,11 +382,21 @@ def view_job(request, pk):
             cwa = ApplyForm()
             role = request.user.groups.all()[0].name
 
-        return render(request, "view_job.html", {'title': 'About job',
+            if role == 'Candidates':
+                my_file = request.user.candidate.cv
+                print(my_file, j)
+
+        return render(request, "view_job.html", {'title': 'Job Description',
                                                  'current_user': current_user,
                                                  'role': role,
                                                  'job': j,
                                                  'form': cwa,
                                                  'has_applied': applied})
-    except ObjectDoesNotExist:
+
+    except ObjectDoesNotExist as e:
+        logger.info(f"function: {view_job.__name__}, msg:{e}")
+        return redirect('jobs')
+
+    except Exception as e:
+        logger.info(f"function: {view_job.__name__}, msg:{e}")
         return redirect('jobs')

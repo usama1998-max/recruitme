@@ -16,17 +16,17 @@
         <table class="table mt-4 ml-2">
             <thead>
                 <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">CV</th>
-                    <th scope="col">Approve</th>
+                    <th scope="col" style="text-align:center;">Name</th>
+                    <th scope="col" style="text-align:center;">Email</th>
+                    <th scope="col" style="text-align:center;">CV</th>
+                    <th scope="col" style="text-align:center;">Approve</th>
                 </tr>
             </thead>
             <tbody>
                 {% for cwa in cwa %}
                 {% if cwa.role == job_title %}
                 <tr>
-                    <td scope="row">{{ cwa.full_name }}</td>
+                    <td scope="row">{{ cwa.full_name }}...</td>
                     <td scope="row"><a href="{% url 'candidate' cwa.id %}">{{ cwa.email }}</a></td>
                     <td scope="row"><a href="{% get_media_prefix %}{{ cwa.cv }}" class="btn bg-dark text-light">CV</a></td>
                     <td class="row d-flex">
