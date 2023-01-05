@@ -169,14 +169,14 @@ def about_hr(request, user):
 @login_required(login_url=settings.LOGIN_URL)
 @redirect_on_user_roles(allowed_group='HR')
 def dashboard(request, title):
-    current_user = request.user
+    current_user = User.objects.get(username=request.user)
     role = current_user.groups.all()[0].name
     cwa = None
 
     if request.method == 'POST':
         if request.POST.get('accept'):
             print(request.POST)
-            return redirect('dashboard')
+            return redirect('dashboard', title=title)
         elif request.POST.get('reject'):
             c = CandidatesWhoApplied.objects.get(id=int(request.POST.get('reject')))
             c.delete()
@@ -198,7 +198,8 @@ def dashboard(request, title):
 def job_post_list(request, user):
     try:
         current_user = User.objects.get(username=user)
-        job = JobPost.objects.all()
+        user_hr = HumanResource.objects.get(user=current_user)
+        job = JobPost.objects.filter(user=user_hr)
         role = None
         if request.user.groups.all()[0].name:
             role = request.user.groups.all()[0].name
@@ -255,7 +256,7 @@ def candidate_register(request):
 @csrf_protect
 @login_required(login_url=settings.LOGIN_URL)
 @redirect_on_user_roles(allowed_group='Candidates')
-def candidate_profile(request):
+def candidate_profile(request, user):
     user_role = None
     form = UserUpdateForm()
     c_form = CandidateProfile()
@@ -273,7 +274,7 @@ def candidate_profile(request):
         else:
             messages.error(request, form.errors)
     else:
-        form = UserUpdateForm(instance=request.user)
+        form = UserUpdateForm(instance=user)
         c_form = CandidateProfile(instance=request.user.candidate)
         profile_image = request.user.candidate.profile_pic.url
         print(profile_image)
@@ -294,6 +295,7 @@ def candidate_profile(request):
 def about_candidate(request, user):
     try:
         cu = User.objects.get(username=user)
+        print(cu)
         candidate = Candidate.objects.get(user=cu)
         profile_image = candidate.profile_pic.url
         role = None
@@ -301,10 +303,37 @@ def about_candidate(request, user):
             role = request.user.groups.all()[0].name
 
         return render(request, "candidate.html", {'title': 'About',
-                                                  'current_user': request.user,
+                                                  'current_user': cu,
                                                   'candidate': candidate,
                                                   'profile_image': profile_image,
+                                                  'cu': cu,
                                                   'role': role})
+
+    except ObjectDoesNotExist as e:
+        logger.info(f"function: {about_candidate.__name__}, msg:{e}")
+        return redirect('home')
+
+    except Exception as e:
+        logger.info(f"function: {about_candidate.__name__}, msg:{e}")
+        return redirect('home')
+
+
+@login_required(login_url=settings.LOGIN_URL)
+def candidate_info(request, user):
+    try:
+        cu = User.objects.get(username=user)
+        candidate = Candidate.objects.get(user=cu)
+        profile_image = candidate.profile_pic.url
+        role = None
+        if request.user.groups.all()[0].name:
+            role = request.user.groups.all()[0].name
+
+        return render(request, "candidate_info.html", {'title': 'About',
+                                                       'current_user': cu,
+                                                       'candidate': candidate,
+                                                       'profile_image': profile_image,
+                                                       'cu': cu,
+                                                       'role': role})
 
     except ObjectDoesNotExist as e:
         logger.info(f"function: {about_candidate.__name__}, msg:{e}")
@@ -372,6 +401,7 @@ def view_job(request, job_id):
             if cwa.is_valid():
                 CandidatesWhoApplied.objects.create(full_name=name,
                                                     email=request.user.email,
+                                                    username=request.user,
                                                     role=j.title,
                                                     cv=cwa.cleaned_data['cv'])
 
